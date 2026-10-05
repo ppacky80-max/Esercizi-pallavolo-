@@ -1,0 +1,8 @@
+{
+  "name": "ESERCIZI PALLAVOLO",
+  "description": "Gestionale professionale per allenatori di pallavolo: archivio esercizi, lavagna tattica interattiva, pianificazione allenamenti e stampa PDF.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

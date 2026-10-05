@@ -1,0 +1,166 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Profilo Utente (accessibile e gestibile dall'amministratore e dal coach)
+    match /users/{userId} {
+      allow read: if true;
+      allow create, update: if isValidId(userId);
+      allow delete: if true;
+    }
+
+    // Spazio Banner a rotazione (gestiti dall'amministratore, visibili a tutti)
+    match /banners/{bannerId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // News & Curiosità (gestite dall'amministratore, consultabili da tutti i coach)
+    match /news/{newsId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Verifiche Email e Attivazione Account
+    match /verifications/{docId} {
+      allow read, write: if true;
+    }
+
+    // Coda invio email
+    match /mail/{mailId} {
+      allow read, write: if true;
+    }
+
+    // Inviti e link di attivazione
+    match /invitations/{invitationId} {
+      allow read, write: if true;
+    }
+
+    // Esercizi (Archivio condiviso della community: lettura aperta per tutti i coach; creazione e modifica con integrità dati)
+    match /exercises/{exerciseId} {
+      allow read: if true;
+      allow create: if isValidId(exerciseId)
+        && request.resource.data.coachId is string
+        && request.resource.data.coachId.size() > 0
+        && request.resource.data.titolo is string
+        && request.resource.data.titolo.size() > 0
+        && request.resource.data.titolo.size() <= 150
+        && request.resource.data.categoria is string
+        && request.resource.data.difficolta in ['Base', 'Intermedio', 'Avanzato']
+        && request.resource.data.durata is number;
+      allow update: if request.resource.data.coachId is string
+        && request.resource.data.coachId == resource.data.coachId;
+      allow delete: if (isSignedIn() && resource.data.coachId == request.auth.uid)
+        || resource.data.coachId is string;
+    }
+
+    // Allenamenti
+    match /workouts/{workoutId} {
+      allow get: if isSignedIn() && resource.data.coachId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.coachId == request.auth.uid;
+      allow create: if isSignedIn() 
+        && isValidId(workoutId)
+        && request.resource.data.coachId == request.auth.uid
+        && request.resource.data.titolo is string
+        && request.resource.data.titolo.size() > 0
+        && request.resource.data.titolo.size() <= 150;
+      allow update: if isSignedIn() 
+        && resource.data.coachId == request.auth.uid
+        && request.resource.data.coachId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.coachId == request.auth.uid;
+    }
+
+    // Squadre
+    match /teams/{teamId} {
+      allow get: if isSignedIn() && resource.data.coachId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.coachId == request.auth.uid;
+      allow create: if isSignedIn() 
+        && isValidId(teamId)
+        && request.resource.data.coachId == request.auth.uid
+        && request.resource.data.nome is string
+        && request.resource.data.nome.size() > 0;
+      allow update: if isSignedIn() 
+        && resource.data.coachId == request.auth.uid
+        && request.resource.data.coachId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.coachId == request.auth.uid;
+    }
+
+    // Atleti (Players)
+    match /players/{playerId} {
+      allow get: if isSignedIn() && resource.data.coachId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.coachId == request.auth.uid;
+      allow create: if isSignedIn() 
+        && isValidId(playerId)
+        && request.resource.data.coachId == request.auth.uid
+        && request.resource.data.nome is string
+        && request.resource.data.cognome is string
+        && request.resource.data.teamId is string;
+      allow update: if isSignedIn() 
+        && resource.data.coachId == request.auth.uid
+        && request.resource.data.coachId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.coachId == request.auth.uid;
+    }
+
+    // Eventi Calendario (Partite, Tornei, Allenamenti speciali)
+    match /events/{eventId} {
+      allow get: if isSignedIn() && resource.data.coachId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.coachId == request.auth.uid;
+      allow create: if isSignedIn() 
+        && isValidId(eventId)
+        && request.resource.data.coachId == request.auth.uid
+        && request.resource.data.titolo is string
+        && request.resource.data.data is string;
+      allow update: if isSignedIn() 
+        && resource.data.coachId == request.auth.uid
+        && request.resource.data.coachId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.coachId == request.auth.uid;
+    }
+
+    // Stagioni
+    match /seasons/{seasonId} {
+      allow get: if isSignedIn() && resource.data.coachId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.coachId == request.auth.uid;
+      allow create: if isSignedIn() 
+        && isValidId(seasonId)
+        && request.resource.data.coachId == request.auth.uid
+        && request.resource.data.nome is string;
+      allow update: if isSignedIn() 
+        && resource.data.coachId == request.auth.uid
+        && request.resource.data.coachId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.coachId == request.auth.uid;
+    }
+
+    // Schemi Tattici e Rotazioni
+    match /tactical_schemes/{schemeId} {
+      allow get: if isSignedIn() && resource.data.coachId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.coachId == request.auth.uid;
+      allow create: if isSignedIn() 
+        && isValidId(schemeId)
+        && request.resource.data.coachId == request.auth.uid
+        && request.resource.data.titolo is string
+        && request.resource.data.titolo.size() > 0
+        && request.resource.data.categoria is string;
+      allow update: if isSignedIn() 
+        && resource.data.coachId == request.auth.uid
+        && request.resource.data.coachId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.coachId == request.auth.uid;
+    }
+  }
+}

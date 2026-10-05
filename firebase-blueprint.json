@@ -1,0 +1,425 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Profilo utente allenatore di pallavolo",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "ID utente Auth"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Indirizzo email dell'allenatore"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Nome visualizzato"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Data di registrazione"
+        }
+      },
+      "required": ["id", "email"]
+    },
+    "Exercise": {
+      "title": "Exercise",
+      "description": "Esercizio di pallavolo nell'archivio, condiviso in sola lettura tra tutti gli utenti registrati",
+      "type": "object",
+      "properties": {
+        "coachId": {
+          "type": "string",
+          "description": "ID dell'allenatore autore/proprietario"
+        },
+        "authorName": {
+          "type": "string",
+          "description": "Nome dell'autore dell'esercizio"
+        },
+        "titolo": {
+          "type": "string",
+          "maxLength": 150,
+          "description": "Titolo dell'esercizio"
+        },
+        "categoria": {
+          "type": "string",
+          "enum": [
+            "Riscaldamento",
+            "Ricezione",
+            "Difesa",
+            "Copertura",
+            "Alzata",
+            "Battuta",
+            "Muro",
+            "Attacco e difesa",
+            "Battuta e ricezione",
+            "Breakpoint",
+            "Cambiopalla",
+            "Globale",
+            "Giochi a punteggio",
+            "Tecnica di base"
+          ],
+          "description": "Categoria tecnica dell'esercizio"
+        },
+        "durata": {
+          "type": "number",
+          "description": "Durata in minuti"
+        },
+        "difficolta": {
+          "type": "string",
+          "enum": ["Base", "Intermedio", "Avanzato"],
+          "description": "Livello di difficoltà"
+        },
+        "obiettivo": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Obiettivo didattico o tattico"
+        },
+        "minPlayers": {
+          "type": "number",
+          "description": "Numero minimo di giocatori"
+        },
+        "maxPlayers": {
+          "type": "number",
+          "description": "Numero massimo di giocatori"
+        },
+        "materiale": {
+          "type": "string",
+          "maxLength": 300,
+          "description": "Materiale necessario per l'esercizio"
+        },
+        "descrizione": {
+          "type": "string",
+          "maxLength": 3000,
+          "description": "Spiegazione dettagliata dello svolgimento"
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "Note e accorgimenti per l'allenatore"
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL dell'immagine o lavagna esportata"
+        },
+        "boardData": {
+          "type": "string",
+          "description": "Dati vettoriali o JSON della lavagna tattica"
+        },
+        "isFavorite": {
+          "type": "boolean",
+          "description": "Se l'esercizio è contrassegnato come preferito"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Data e ora di creazione"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Data e ora di ultimo aggiornamento"
+        }
+      },
+      "required": ["coachId", "titolo", "categoria", "durata", "difficolta"]
+    },
+    "Workout": {
+      "title": "Workout",
+      "description": "Scheda allenamento programmata",
+      "type": "object",
+      "properties": {
+        "coachId": {
+          "type": "string",
+          "description": "ID dell'allenatore proprietario"
+        },
+        "titolo": {
+          "type": "string",
+          "maxLength": 150,
+          "description": "Titolo della seduta di allenamento"
+        },
+        "squadra": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Nome della squadra"
+        },
+        "teamId": {
+          "type": "string",
+          "description": "ID eventuale della squadra associata"
+        },
+        "data": {
+          "type": "string",
+          "description": "Data dell'allenamento YYYY-MM-DD"
+        },
+        "oraInizio": {
+          "type": "string",
+          "description": "Orario inizio HH:mm"
+        },
+        "oraFine": {
+          "type": "string",
+          "description": "Orario fine HH:mm"
+        },
+        "obiettivo": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Obiettivo principale della seduta"
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "Note generali"
+        },
+        "esercizi": {
+          "type": "string",
+          "description": "Snapshot JSON degli esercizi ordinati per la seduta"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Data di creazione"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Data di ultimo aggiornamento"
+        }
+      },
+      "required": ["coachId", "titolo", "squadra", "data", "oraInizio", "oraFine"]
+    },
+    "Team": {
+      "title": "Team",
+      "description": "Squadra gestita dal coach",
+      "type": "object",
+      "properties": {
+        "coachId": {
+          "type": "string",
+          "description": "ID dell'allenatore"
+        },
+        "nome": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Nome della squadra (es. Under 16 Femminile)"
+        },
+        "categoria": {
+          "type": "string",
+          "maxLength": 50,
+          "description": "Categoria (es. U14, U16, U18, Serie C, Prima Squadra)"
+        },
+        "stagione": {
+          "type": "string",
+          "maxLength": 30,
+          "description": "Stagione sportiva (es. 2026/2027)"
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Note della squadra"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Data di creazione"
+        }
+      },
+      "required": ["coachId", "nome", "categoria"]
+    },
+    "TacticalScheme": {
+      "title": "TacticalScheme",
+      "description": "Schema tattico di pallavolo con rotazione e scene",
+      "type": "object",
+      "properties": {
+        "coachId": {
+          "type": "string",
+          "description": "ID dell'allenatore"
+        },
+        "titolo": {
+          "type": "string",
+          "maxLength": 150,
+          "description": "Titolo dello schema tattico"
+        },
+        "categoria": {
+          "type": "string",
+          "enum": [
+            "Ricezione",
+            "Battuta",
+            "Attacco",
+            "Muro",
+            "Difesa",
+            "Copertura",
+            "Cambio palla",
+            "Breakpoint",
+            "Contrattacco",
+            "Altro"
+          ],
+          "description": "Categoria dello schema"
+        },
+        "sistemaDiGioco": {
+          "type": "string",
+          "enum": ["5-1", "4-2", "6-2", "Personalizzato"],
+          "description": "Sistema di gioco"
+        },
+        "rotazione": {
+          "type": "number",
+          "description": "Numero di rotazione 1-6"
+        },
+        "descrizione": {
+          "type": "string",
+          "maxLength": 2000,
+          "description": "Spiegazione tattica dello schema"
+        },
+        "boardData": {
+          "type": "string",
+          "description": "Dati JSON della lavagna tattica"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Data di creazione"
+        }
+      },
+      "required": ["coachId", "titolo", "categoria", "sistemaDiGioco"]
+    },
+    "Banner": {
+      "title": "Banner",
+      "description": "Banner promozionali o comunicazioni a rotazione gestiti dall'amministratore",
+      "type": "object",
+      "properties": {
+        "titolo": {
+          "type": "string",
+          "maxLength": 150,
+          "description": "Titolo principale del banner"
+        },
+        "sottotitolo": {
+          "type": "string",
+          "maxLength": 300,
+          "description": "Testo descrittivo del banner"
+        },
+        "badgeTesto": {
+          "type": "string",
+          "description": "Etichetta del badge"
+        },
+        "badgeColore": {
+          "type": "string",
+          "description": "Colore del badge"
+        },
+        "immagineUrl": {
+          "type": "string",
+          "description": "URL dell'immagine o sfondo del banner"
+        },
+        "linkUrl": {
+          "type": "string",
+          "description": "Link di destinazione"
+        },
+        "linkTesto": {
+          "type": "string",
+          "description": "Testo del pulsante di azione"
+        },
+        "attivo": {
+          "type": "boolean",
+          "description": "Se il banner è attualmente mostrato nella rotazione"
+        },
+        "ordine": {
+          "type": "number",
+          "description": "Numero sequenza d'ordine"
+        },
+        "dataCreazione": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Data di creazione"
+        }
+      },
+      "required": ["titolo", "attivo", "ordine"]
+    },
+    "News": {
+      "title": "News",
+      "description": "Notizie, curiosità, approfondimenti tattici e regolamentari gestiti dall'amministratore",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "ID univoco notizia"
+        },
+        "titolo": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Titolo della notizia o curiosità"
+        },
+        "estratto": {
+          "type": "string",
+          "maxLength": 300,
+          "description": "Breve riassunto per l'anteprima"
+        },
+        "contenuto": {
+          "type": "string",
+          "description": "Corpo completo della notizia"
+        },
+        "categoria": {
+          "type": "string",
+          "enum": ["Notizie", "Curiosità", "Tattica & Tecnica", "Regolamento", "Aggiornamenti"],
+          "description": "Categoria della notizia"
+        },
+        "autore": {
+          "type": "string",
+          "description": "Nome dell'autore (Amministrazione)"
+        },
+        "data": {
+          "type": "string",
+          "description": "Data di pubblicazione (YYYY-MM-DD)"
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL dell'immagine illustrativa"
+        },
+        "inEvidenza": {
+          "type": "boolean",
+          "description": "Se mostrare la notizia in evidenza con badge"
+        },
+        "tag": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Tag tematici"
+        }
+      },
+      "required": ["titolo", "contenuto", "categoria"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Documenti profilo allenatore, accessibili solo dall'utente proprietario"
+    },
+    "/exercises/{exerciseId}": {
+      "schema": "Exercise",
+      "description": "Archivio esercizi di pallavolo, condiviso in sola lettura tra tutti gli utenti registrati con modifica riservata all'autore"
+    },
+    "/workouts/{workoutId}": {
+      "schema": "Workout",
+      "description": "Allenamenti pianificati con snapshot degli esercizi, isolati per coach"
+    },
+    "/teams/{teamId}": {
+      "schema": "Team",
+      "description": "Squadre gestite dall'allenatore, isolate per coach"
+    },
+    "/tactical_schemes/{schemeId}": {
+      "schema": "TacticalScheme",
+      "description": "Schemi tattici e rotazioni salvati dall'allenatore, isolati per coach"
+    },
+    "/banners/{bannerId}": {
+      "schema": "Banner",
+      "description": "Spazio banner promozionali e comunicazioni a rotazione gestiti dall'amministratore"
+    },
+    "/news/{newsId}": {
+      "schema": "News",
+      "description": "Notizie e curiosità del volley gestite esclusivamente dall'amministrazione e consultabili da tutti i coach"
+    },
+    "/verifications/{docId}": {
+      "description": "Token di verifica email e attivazione account"
+    },
+    "/invitations/{invitationId}": {
+      "description": "Inviti per nuovi coach con link di attivazione generati dall'amministratore"
+    }
+  }
+}
